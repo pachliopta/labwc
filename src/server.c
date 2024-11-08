@@ -18,6 +18,7 @@
 #include <wlr/types/wlr_single_pixel_buffer_v1.h>
 #include <wlr/types/wlr_viewporter.h>
 #include <wlr/types/wlr_tablet_v2.h>
+#include <wlr/types/wlr_linux_drm_syncobj_v1.h>
 #if HAVE_XWAYLAND
 #include <wlr/xwayland.h>
 #include "xwayland-shell-v1-protocol.h"
@@ -308,6 +309,8 @@ handle_renderer_lost(struct wl_listener *listener, void *data)
 void
 server_init(struct server *server)
 {
+
+
 	server->primary_client_pid = -1;
 	server->wl_display = wl_display_create();
 	if (!server->wl_display) {
@@ -412,6 +415,12 @@ server_init(struct server *server)
 	} else {
 		wlr_log(WLR_DEBUG, "unable to initialize dmabuf");
 	}
+	if (wlr_renderer_get_drm_fd(server->renderer) >= 0 &&
+			server->renderer->features.timeline &&
+			server->backend->features.timeline) {
+		wlr_linux_drm_syncobj_manager_v1_create(server->wl_display, 1,
+			wlr_renderer_get_drm_fd(server->renderer));
+	}
 
 	/*
 	 * Autocreates an allocator for us. The allocator is the bridge between
@@ -435,7 +444,7 @@ server_init(struct server *server)
 		wlr_log(WLR_ERROR, "unable to create scene");
 		exit(EXIT_FAILURE);
 	}
-	server->direct_scanout_enabled = server->scene->direct_scanout;
+	server->direct_scanout_enabled = server->scene->WLR_PRIVATE.direct_scanout;
 
 	/*
 	 * The order in which the scene-trees below are created determines the
@@ -515,7 +524,7 @@ server_init(struct server *server)
 	xdg_server_decoration_init(server);
 
 	struct wlr_presentation *presentation =
-		wlr_presentation_create(server->wl_display, server->backend);
+		wlr_presentation_create(server->wl_display, server->backend, 2);
 	if (!presentation) {
 		wlr_log(WLR_ERROR, "unable to create presentation interface");
 		exit(EXIT_FAILURE);

@@ -200,8 +200,7 @@ update_popup_position(struct input_method_popup *popup)
 
 		if (xdg_surface) {
 			/* Take into account invisible xdg-shell CSD borders */
-			struct wlr_box geo;
-			wlr_xdg_surface_get_geometry(xdg_surface, &geo);
+			struct wlr_box geo = xdg_surface->geometry;
 			cursor_rect.x -= geo.x;
 			cursor_rect.y -= geo.y;
 		}

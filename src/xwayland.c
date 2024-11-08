@@ -65,7 +65,7 @@ xwayland_view_wants_focus(struct view *view)
 	struct wlr_xwayland_surface *xsurface =
 		xwayland_surface_from_view(view);
 
-	switch (wlr_xwayland_icccm_input_model(xsurface)) {
+	switch (wlr_xwayland_surface_icccm_input_model(xsurface)) {
 	/*
 	 * Abbreviated from ICCCM section 4.1.7 (Input Focus):
 	 *
@@ -803,7 +803,7 @@ static void
 xwayland_view_maximize(struct view *view, bool maximized)
 {
 	wlr_xwayland_surface_set_maximized(xwayland_surface_from_view(view),
-		maximized);
+		maximized, maximized);
 }
 
 static void

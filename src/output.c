@@ -96,7 +96,7 @@ output_apply_gamma(struct output *output)
 		return;
 	}
 
-	if (!lab_wlr_scene_output_commit(scene_output, &pending)) {
+	if (!wlr_scene_output_commit(scene_output, NULL)) {
 		wlr_gamma_control_v1_send_failed_and_destroy(gamma_control);
 	}
 
@@ -141,7 +141,7 @@ output_frame_notify(struct wl_listener *listener, void *data)
 
 		pending->tearing_page_flip = output_get_tearing_allowance(output);
 
-		lab_wlr_scene_output_commit(scene_output, pending);
+		wlr_scene_output_commit(scene_output, NULL);
 	}
 
 	struct timespec now = { 0 };
